@@ -3,146 +3,255 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Malın Resim Düzenleyicisi</title>
+<title>Malın Resim Düzenleyicisi - PowerPoint Edition</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body {
-    background: #0f0f13;
-    color: #e7eef8;
-    font-family: system-ui, -apple-system, sans-serif;
+    background: #f3f3f3;
+    color: #323130;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
   }
-  header {
-    padding: 10px 16px;
-    background: #16161d;
-    border-bottom: 1px solid #2a2a35;
+
+  /* Üst başlık çubuğu (PowerPoint gibi) */
+  .titlebar {
+    background: #b7472a;
+    color: white;
+    padding: 8px 16px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 600;
     flex-shrink: 0;
   }
-  h1 { font-size: 16px; font-weight: 600; }
-  .toolbar, .controls {
+  .titlebar span { opacity: 0.9; }
+
+  /* Ribbon */
+  .ribbon {
+    background: #f3f3f3;
+    border-bottom: 1px solid #d1d1d1;
+    flex-shrink: 0;
+  }
+  .ribbon-tabs {
+    display: flex;
+    background: #f3f3f3;
+    border-bottom: 1px solid #e1e1e1;
+    padding: 0 8px;
+  }
+  .ribbon-tab {
+    padding: 8px 16px;
+    font-size: 12px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    color: #323130;
+  }
+  .ribbon-tab.active {
+    border-bottom-color: #b7472a;
+    font-weight: 600;
+    background: white;
+  }
+  .ribbon-content {
+    background: white;
+    padding: 8px 12px;
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    padding: 8px 12px;
-    background: #121218;
-    border-bottom: 1px solid #2a2a35;
-    flex-shrink: 0;
+    align-items: center;
+    border-bottom: 1px solid #e1e1e1;
   }
-  .controls { background: #0f0f13; }
+
+  /* Butonlar */
   button, label.btn {
-    background: #1e1e28;
-    border: 1px solid #333;
-    color: #e7eef8;
-    padding: 7px 12px;
-    border-radius: 6px;
+    background: #ffffff;
+    border: 1px solid #d1d1d1;
+    color: #323130;
+    padding: 6px 11px;
+    border-radius: 2px;
     cursor: pointer;
     font-size: 12px;
-    transition: 0.12s;
+    transition: 0.1s;
     user-select: none;
     white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
   }
-  button:hover, label.btn:hover { background: #2a2a38; }
-  button:active { transform: scale(0.96); }
-  button.active { background: #3b3b50; border-color: #e7c27a; color: #e7c27a; }
+  button:hover, label.btn:hover {
+    background: #f5f5f5;
+    border-color: #b7472a;
+  }
+  button:active { background: #e8e8e8; }
+  button.active {
+    background: #fce4d6;
+    border-color: #b7472a;
+    color: #b7472a;
+  }
   input[type="file"] { display: none; }
-  .controls label {
+
+  /* Kontroller */
+  .controls-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    padding: 6px 12px;
+    background: #fafafa;
+    border-bottom: 1px solid #e1e1e1;
+    font-size: 12px;
+  }
+  .controls-row label {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 12px;
   }
   input[type="range"] {
     width: 90px;
-    accent-color: #e7c27a;
+    accent-color: #b7472a;
   }
+  input[type="color"] {
+    width: 32px;
+    height: 26px;
+    border: 1px solid #d1d1d1;
+    border-radius: 2px;
+    padding: 1px;
+    cursor: pointer;
+    background: white;
+  }
+
+  /* Çalışma alanı */
   #workspace {
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: auto;
-    padding: 12px;
-    background: #0a0a0e;
+    padding: 16px;
+    background: #e5e5e5;
     position: relative;
   }
   canvas {
     max-width: 100%;
     max-height: 100%;
-    box-shadow: 0 0 30px rgba(0,0,0,0.7);
-    background: #111;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+    background: white;
     touch-action: none;
   }
-  .info {
-    padding: 6px 14px;
+
+  /* Alt durum çubuğu */
+  .statusbar {
+    padding: 5px 14px;
     font-size: 11px;
-    color: #777;
-    background: #121218;
+    color: #605e5c;
+    background: #f3f3f3;
+    border-top: 1px solid #d1d1d1;
     flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
   }
+
+  /* Renk presetleri */
+  .color-presets {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .color-preset {
+    width: 20px;
+    height: 20px;
+    border-radius: 2px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+  }
+  .color-preset:hover { transform: scale(1.15); }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>Malın Resim Düzenleyicisi</h1>
-  <span style="font-size:11px;color:#555">düzeltilmiş versiyon</span>
-</header>
-
-<div class="toolbar">
-  <label class="btn">
-    Resim Yükle
-    <input type="file" id="fileInput" accept="image/*">
-  </label>
-  <button id="btnCrop">Kırp</button>
-  <button id="btnDraw">Çiz</button>
-  <button id="btnEraser">Silgi</button>
-  <button id="btnRotate">90°</button>
-  <button id="btnUndo">Geri</button>
-  <button id="btnRedo">İleri</button>
-  <button id="btnReset">Sıfırla</button>
-  <button id="btnDownload">PNG İndir</button>
+<div class="titlebar">
+  <div>Malın Resim Düzenleyicisi</div>
+  <span>PowerPoint ruhuyla</span>
 </div>
 
-<div class="controls">
+<div class="ribbon">
+  <div class="ribbon-tabs">
+    <div class="ribbon-tab active">Giriş</div>
+    <div class="ribbon-tab">Düzenle</div>
+  </div>
+  <div class="ribbon-content">
+    <label class="btn">
+      📂 Resim Yükle
+      <input type="file" id="fileInput" accept="image/*">
+    </label>
+    <button id="btnCrop">✂️ Kırp</button>
+    <button id="btnDraw">✏️ Çiz</button>
+    <button id="btnEraser">🧽 Silgi</button>
+    <button id="btnRotate">🔄 90°</button>
+    <button id="btnUndo">↩️ Geri</button>
+    <button id="btnRedo">↪️ İleri</button>
+    <button id="btnReset">🔄 Sıfırla</button>
+    <button id="btnDownload">💾 PNG İndir</button>
+  </div>
+</div>
+
+<div class="controls-row">
   <label>Parlaklık <input type="range" id="brightness" min="-100" max="100" value="0"></label>
   <label>Kontrast <input type="range" id="contrast" min="-100" max="100" value="0"></label>
-  <button id="btnGray">Gri</button>
+  <button id="btnGray">Gri Ton</button>
   <button id="btnSepia">Sepia</button>
   <button id="btnClearFilter">Filtre Temizle</button>
-  <label>Fırça <input type="range" id="brushSize" min="1" max="50" value="8"></label>
+
+  <label>Fırça <input type="range" id="brushSize" min="1" max="60" value="8"></label>
+
+  <label>Renk 
+    <input type="color" id="brushColor" value="#e74c3c">
+  </label>
+
+  <div class="color-presets">
+    <div class="color-preset" style="background:#e74c3c" data-color="#e74c3c"></div>
+    <div class="color-preset" style="background:#3498db" data-color="#3498db"></div>
+    <div class="color-preset" style="background:#2ecc71" data-color="#2ecc71"></div>
+    <div class="color-preset" style="background:#f1c40f" data-color="#f1c40f"></div>
+    <div class="color-preset" style="background:#9b59b6" data-color="#9b59b6"></div>
+    <div class="color-preset" style="background:#000000" data-color="#000000"></div>
+    <div class="color-preset" style="background:#ffffff; border:1px solid #999" data-color="#ffffff"></div>
+  </div>
 </div>
 
 <div id="workspace">
-<div class="canvas-container"><canvas id="canvas"></canvas></div>
+  <canvas id="canvas"></canvas>
 </div>
 
-<div class="info" id="info">Resim yükle amına kodumun malı.</div>
+<div class="statusbar">
+  <span id="info">Resim yükle amına kodumun malı.</span>
+  <span>Hazır</span>
+</div>
 
 <script>
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d', { willReadFrequently: true });
 const fileInput = document.getElementById('fileInput');
 const info = document.getElementById('info');
+const brushColorInput = document.getElementById('brushColor');
 
-let originalImage = null;      // ilk yüklenen resim
-let currentBase = null;        // filtreler uygulanmadan önceki son hali
+let originalImage = null;
+let currentBase = null;
 let history = [];
 let historyIndex = -1;
 
-let mode = null; // null | 'draw' | 'erase' | 'crop'
+let mode = null;
 let isDrawing = false;
 let lastX = 0, lastY = 0;
 let cropStart = null;
 let cropEnd = null;
+let cropSnapshot = null;
 
 let brightness = 0;
 let contrast = 0;
+let brushColor = '#e74c3c';
 
 // ---------- Yardımcılar ----------
 function saveState() {
@@ -198,7 +307,416 @@ function setMode(newMode) {
   if (mode === 'crop') {
     info.textContent = 'Kırpmak istediğin alanı sürükle, bırakınca kırpar';
   } else if (mode === 'draw') {
-    info.textContent = 'Çizim modu açık';
+    info.textContent = 'Çizim modu açık – renk seçebilirsin';
+  } else if (mode === 'erase') {
+    info.textContent = 'Silgi açık';
+  } else {
+    info.textContent = originalImage ? `${canvas.width} × ${canvas.height} px` : 'Resim yükle amına kodumun malı.';
+  }
+}
+
+// ---------- Filtreler ----------
+function applyBrightnessContrast() {
+  if (!currentBase) return;
+
+  const temp = document.createElement('canvas');
+  temp.width = canvas.width;
+  temp.height = canvas.height;
+  const tctx = temp.getContext('2d');
+  tctx.drawImage(currentBase, 0, 0);
+
+  const imageData = tctx.getImageData(0, 0, temp.width, temp.height);
+  const data = imageData.data;
+  const b = brightness / 100;
+  const c = (contrast + 100) / 100;
+
+  for (let i = 0; i < data.length; i += 4) {
+    let r = data[i], g = data[i+1], bl = data[i+2];
+    r = ((r / 255 - 0.5) * c + 0.5 + b) * 255;
+    g = ((g / 255 - 0.5) * c + 0.5 + b) * 255;
+    bl = ((bl / 255 - 0.5) * c + 0.5 + b) * 255;
+    data[i]   = Math.min(255, Math.max(0, r));
+    data[i+1] = Math.min(255, Math.max(0, g));
+    data[i+2] = Math.min(255, Math.max(0, bl));
+  }
+  tctx.putImageData(imageData, 0, 0);
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(temp, 0, 0);
+}
+
+function updateCurrentBase() {
+  currentBase = new Image();
+  currentBase.src = canvas.toDataURL('image/png');
+}
+
+// ---------- Dosya yükleme ----------
+fileInput.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      originalImage = img;
+      currentBase = img;
+      history = [];
+      historyIndex = -1;
+      brightness = contrast = 0;
+      document.getElementById('brightness').value = 0;
+      document.getElementById('contrast').value = 0;
+      saveState();
+      setMode(null);
+      info.textContent = `${img.width} × ${img.height} px`;
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+// ---------- Kontroller ----------
+document.getElementById('brightness').addEventListener('input', e => {
+  brightness = +e.target.value;
+  applyBrightnessContrast();
+});
+document.getElementById('contrast').addEventListener('input', e => {
+  contrast = +e.target.value;
+  applyBrightnessContrast();
+});
+
+document.getElementById('btnGray').onclick = () => {
+  if (!originalImage) return;
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    const avg = (data[i] + data[i+1] + data[i+2]) / 3;
+    data[i] = data[i+1] = data[i+2] = avg;
+  }
+  ctx.putImageData(imageData, 0, 0);
+  updateCurrentBase();
+  saveState();
+};
+
+document.getElementById('btnSepia').onclick = () => {
+  if (!originalImage) return;
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i+1], b = data[i+2];
+    data[i]   = Math.min(255, r * 0.393 + g * 0.769 + b * 0.189);
+ <!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Malın Resim Düzenleyicisi - PowerPoint Edition</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: #f3f3f3;
+    color: #323130;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Üst başlık çubuğu (PowerPoint gibi) */
+  .titlebar {
+    background: #b7472a;
+    color: white;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .titlebar span { opacity: 0.9; }
+
+  /* Ribbon */
+  .ribbon {
+    background: #f3f3f3;
+    border-bottom: 1px solid #d1d1d1;
+    flex-shrink: 0;
+  }
+  .ribbon-tabs {
+    display: flex;
+    background: #f3f3f3;
+    border-bottom: 1px solid #e1e1e1;
+    padding: 0 8px;
+  }
+  .ribbon-tab {
+    padding: 8px 16px;
+    font-size: 12px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    color: #323130;
+  }
+  .ribbon-tab.active {
+    border-bottom-color: #b7472a;
+    font-weight: 600;
+    background: white;
+  }
+  .ribbon-content {
+    background: white;
+    padding: 8px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    border-bottom: 1px solid #e1e1e1;
+  }
+
+  /* Butonlar */
+  button, label.btn {
+    background: #ffffff;
+    border: 1px solid #d1d1d1;
+    color: #323130;
+    padding: 6px 11px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: 0.1s;
+    user-select: none;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  button:hover, label.btn:hover {
+    background: #f5f5f5;
+    border-color: #b7472a;
+  }
+  button:active { background: #e8e8e8; }
+  button.active {
+    background: #fce4d6;
+    border-color: #b7472a;
+    color: #b7472a;
+  }
+  input[type="file"] { display: none; }
+
+  /* Kontroller */
+  .controls-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    padding: 6px 12px;
+    background: #fafafa;
+    border-bottom: 1px solid #e1e1e1;
+    font-size: 12px;
+  }
+  .controls-row label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  input[type="range"] {
+    width: 90px;
+    accent-color: #b7472a;
+  }
+  input[type="color"] {
+    width: 32px;
+    height: 26px;
+    border: 1px solid #d1d1d1;
+    border-radius: 2px;
+    padding: 1px;
+    cursor: pointer;
+    background: white;
+  }
+
+  /* Çalışma alanı */
+  #workspace {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: auto;
+    padding: 16px;
+    background: #e5e5e5;
+    position: relative;
+  }
+  canvas {
+    max-width: 100%;
+    max-height: 100%;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+    background: white;
+    touch-action: none;
+  }
+
+  /* Alt durum çubuğu */
+  .statusbar {
+    padding: 5px 14px;
+    font-size: 11px;
+    color: #605e5c;
+    background: #f3f3f3;
+    border-top: 1px solid #d1d1d1;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* Renk presetleri */
+  .color-presets {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .color-preset {
+    width: 20px;
+    height: 20px;
+    border-radius: 2px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+  }
+  .color-preset:hover { transform: scale(1.15); }
+</style>
+</head>
+<body>
+
+<div class="titlebar">
+  <div>Malın Resim Düzenleyicisi</div>
+  <span>PowerPoint ruhuyla</span>
+</div>
+
+<div class="ribbon">
+  <div class="ribbon-tabs">
+    <div class="ribbon-tab active">Giriş</div>
+    <div class="ribbon-tab">Düzenle</div>
+  </div>
+  <div class="ribbon-content">
+    <label class="btn">
+      📂 Resim Yükle
+      <input type="file" id="fileInput" accept="image/*">
+    </label>
+    <button id="btnCrop">✂️ Kırp</button>
+    <button id="btnDraw">✏️ Çiz</button>
+    <button id="btnEraser">🧽 Silgi</button>
+    <button id="btnRotate">🔄 90°</button>
+    <button id="btnUndo">↩️ Geri</button>
+    <button id="btnRedo">↪️ İleri</button>
+    <button id="btnReset">🔄 Sıfırla</button>
+    <button id="btnDownload">💾 PNG İndir</button>
+  </div>
+</div>
+
+<div class="controls-row">
+  <label>Parlaklık <input type="range" id="brightness" min="-100" max="100" value="0"></label>
+  <label>Kontrast <input type="range" id="contrast" min="-100" max="100" value="0"></label>
+  <button id="btnGray">Gri Ton</button>
+  <button id="btnSepia">Sepia</button>
+  <button id="btnClearFilter">Filtre Temizle</button>
+
+  <label>Fırça <input type="range" id="brushSize" min="1" max="60" value="8"></label>
+
+  <label>Renk 
+    <input type="color" id="brushColor" value="#e74c3c">
+  </label>
+
+  <div class="color-presets">
+    <div class="color-preset" style="background:#e74c3c" data-color="#e74c3c"></div>
+    <div class="color-preset" style="background:#3498db" data-color="#3498db"></div>
+    <div class="color-preset" style="background:#2ecc71" data-color="#2ecc71"></div>
+    <div class="color-preset" style="background:#f1c40f" data-color="#f1c40f"></div>
+    <div class="color-preset" style="background:#9b59b6" data-color="#9b59b6"></div>
+    <div class="color-preset" style="background:#000000" data-color="#000000"></div>
+    <div class="color-preset" style="background:#ffffff; border:1px solid #999" data-color="#ffffff"></div>
+  </div>
+</div>
+
+<div id="workspace">
+  <canvas id="canvas"></canvas>
+</div>
+
+<div class="statusbar">
+  <span id="info">Resim yükle amına kodumun malı.</span>
+  <span>Hazır</span>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d', { willReadFrequently: true });
+const fileInput = document.getElementById('fileInput');
+const info = document.getElementById('info');
+const brushColorInput = document.getElementById('brushColor');
+
+let originalImage = null;
+let currentBase = null;
+let history = [];
+let historyIndex = -1;
+
+let mode = null;
+let isDrawing = false;
+let lastX = 0, lastY = 0;
+let cropStart = null;
+let cropEnd = null;
+let cropSnapshot = null;
+
+let brightness = 0;
+let contrast = 0;
+let brushColor = '#e74c3c';
+
+// ---------- Yardımcılar ----------
+function saveState() {
+  if (historyIndex < history.length - 1) {
+    history = history.slice(0, historyIndex + 1);
+  }
+  history.push(canvas.toDataURL('image/png'));
+  historyIndex++;
+  if (history.length > 25) {
+    history.shift();
+    historyIndex--;
+  }
+}
+
+function loadState(index) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+      resolve();
+    };
+    img.src = history[index];
+  });
+}
+
+function getPointerPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  let clientX, clientY;
+  if (e.touches && e.touches.length) {
+    clientX = e.touches[0].clientX;
+    clientY = e.touches[0].clientY;
+  } else {
+    clientX = e.clientX;
+    clientY = e.clientY;
+  }
+  return {
+    x: (clientX - rect.left) * scaleX,
+    y: (clientY - rect.top) * scaleY
+  };
+}
+
+function setMode(newMode) {
+  mode = (mode === newMode) ? null : newMode;
+  document.getElementById('btnDraw').classList.toggle('active', mode === 'draw');
+  document.getElementById('btnEraser').classList.toggle('active', mode === 'erase');
+  document.getElementById('btnCrop').classList.toggle('active', mode === 'crop');
+
+  if (mode === 'crop') {
+    info.textContent = 'Kırpmak istediğin alanı sürükle, bırakınca kırpar';
+  } else if (mode === 'draw') {
+    info.textContent = 'Çizim modu açık – renk seçebilirsin';
   } else if (mode === 'erase') {
     info.textContent = 'Silgi açık';
   } else {
@@ -375,12 +893,24 @@ document.getElementById('btnDownload').onclick = () => {
   link.click();
 };
 
+// Renk seçimi
+brushColorInput.addEventListener('input', e => {
+  brushColor = e.target.value;
+});
+
+document.querySelectorAll('.color-preset').forEach(el => {
+  el.addEventListener('click', () => {
+    brushColor = el.dataset.color;
+    brushColorInput.value = brushColor;
+  });
+});
+
 // ---------- Mod butonları ----------
 document.getElementById('btnDraw').onclick = () => setMode('draw');
 document.getElementById('btnEraser').onclick = () => setMode('erase');
 document.getElementById('btnCrop').onclick = () => setMode('crop');
 
-// ---------- Pointer olayları (mouse + touch) ----------
+// ---------- Pointer olayları ----------
 function startPointer(e) {
   e.preventDefault();
   if (!originalImage) return;
@@ -396,6 +926,7 @@ function startPointer(e) {
   } else if (mode === 'crop') {
     cropStart = pos;
     cropEnd = null;
+    cropSnapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
   }
 }
 
@@ -414,7 +945,7 @@ function movePointer(e) {
       ctx.strokeStyle = 'rgba(0,0,0,1)';
     } else {
       ctx.globalCompositeOperation = 'source-over';
-      ctx.strokeStyle = '#e7c27a';
+      ctx.strokeStyle = brushColor;
     }
 
     ctx.beginPath();
@@ -423,22 +954,20 @@ function movePointer(e) {
     ctx.stroke();
     lastX = pos.x;
     lastY = pos.y;
-  } else if (mode === 'crop' && cropStart) {
+  } else if (mode === 'crop' && cropStart && cropSnapshot) {
     cropEnd = pos;
-    // Önizleme için history'den geri yükle + dikdörtgen çiz
-    loadState(historyIndex).then(() => {
-      if (!cropStart || !cropEnd) return;
-      ctx.strokeStyle = '#e7c27a';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([6, 4]);
-      ctx.strokeRect(
-        Math.min(cropStart.x, cropEnd.x),
-        Math.min(cropStart.y, cropEnd.y),
-        Math.abs(cropEnd.x - cropStart.x),
-        Math.abs(cropEnd.y - cropStart.y)
-      );
-      ctx.setLineDash([]);
-    });
+    ctx.putImageData(cropSnapshot, 0, 0);
+
+    ctx.strokeStyle = '#b7472a';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6, 4]);
+    ctx.strokeRect(
+      Math.min(cropStart.x, cropEnd.x),
+      Math.min(cropStart.y, cropEnd.y),
+      Math.abs(cropEnd.x - cropStart.x),
+      Math.abs(cropEnd.y - cropStart.y)
+    );
+    ctx.setLineDash([]);
   }
 }
 
@@ -457,6 +986,7 @@ function endPointer(e) {
     const h = Math.abs(cropEnd.y - cropStart.y);
 
     if (w > 8 && h > 8) {
+      ctx.putImageData(cropSnapshot, 0, 0);
       const imageData = ctx.getImageData(x, y, w, h);
       canvas.width = w;
       canvas.height = h;
@@ -464,8 +994,13 @@ function endPointer(e) {
       updateCurrentBase();
       saveState();
       info.textContent = `${w} × ${h} px (kırpıldı)`;
+    } else {
+      ctx.putImageData(cropSnapshot, 0, 0);
     }
-    cropStart = cropEnd = null;
+
+    cropStart = null;
+    cropEnd = null;
+    cropSnapshot = null;
     setMode(null);
   }
 }
@@ -483,4 +1018,105 @@ canvas.addEventListener('touchend', endPointer, { passive: false });
 canvas.addEventListener('touchcancel', endPointer, { passive: false });
 </script>
 </body>
-</html>
+</html>   data[i+1] = Math.min(255, r * 0.349 + g * 0.686 + b * 0.168);
+    data[i+2] = Math.min(255, r * 0.272 + g * 0.534 + b * 0.131);
+  }
+  ctx.putImageData(imageData, 0, 0);
+  updateCurrentBase();
+  saveState();
+};
+
+document.getElementById('btnClearFilter').onclick = () => {
+  brightness = 0;
+  contrast = 0;
+  document.getElementById('brightness').value = 0;
+  document.getElementById('contrast').value = 0;
+  if (currentBase) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(currentBase, 0, 0);
+    saveState();
+  }
+};
+
+document.getElementById('btnRotate').onclick = async () => {
+  if (!originalImage) return;
+  const temp = document.createElement('canvas');
+  temp.width = canvas.height;
+  temp.height = canvas.width;
+  const tctx = temp.getContext('2d');
+  tctx.translate(temp.width / 2, temp.height / 2);
+  tctx.rotate(Math.PI / 2);
+  tctx.drawImage(canvas, -canvas.width / 2, -canvas.height / 2);
+
+  canvas.width = temp.width;
+  canvas.height = temp.height;
+  ctx.drawImage(temp, 0, 0);
+
+  updateCurrentBase();
+  saveState();
+  info.textContent = `${canvas.width} × ${canvas.height} px`;
+};
+
+document.getElementById('btnUndo').onclick = async () => {
+  if (historyIndex > 0) {
+    historyIndex--;
+    await loadState(historyIndex);
+    updateCurrentBase();
+  }
+};
+document.getElementById('btnRedo').onclick = async () => {
+  if (historyIndex < history.length - 1) {
+    historyIndex++;
+    await loadState(historyIndex);
+    updateCurrentBase();
+  }
+};
+document.getElementById('btnReset').onclick = () => {
+  if (!originalImage) return;
+  canvas.width = originalImage.width;
+  canvas.height = originalImage.height;
+  ctx.drawImage(originalImage, 0, 0);
+  currentBase = originalImage;
+  brightness = contrast = 0;
+  document.getElementById('brightness').value = 0;
+  document.getElementById('contrast').value = 0;
+  history = [];
+  historyIndex = -1;
+  saveState();
+  setMode(null);
+  info.textContent = `${canvas.width} × ${canvas.height} px`;
+};
+
+document.getElementById('btnDownload').onclick = () => {
+  if (!originalImage) return;
+  const link = document.createElement('a');
+  link.download = 'duzenlenmis-resim.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+};
+
+// Renk seçimi
+brushColorInput.addEventListener('input', e => {
+  brushColor = e.target.value;
+});
+
+document.querySelectorAll('.color-preset').forEach(el => {
+  el.addEventListener('click', () => {
+    brushColor = el.dataset.color;
+    brushColorInput.value = brushColor;
+  });
+});
+
+// ---------- Mod butonları ----------
+document.getElementById('btnDraw').onclick = () => setMode('draw');
+document.getElementById('btnEraser').onclick = () => setMode('erase');
+document.getElementById('btnCrop').onclick = () => setMode('crop');
+
+// ---------- Pointer olayları ----------
+function startPointer(e) {
+  e.preventDefault();
+  if (!originalImage) return;
+
+  const pos = getPointerPos(e);
+
+
